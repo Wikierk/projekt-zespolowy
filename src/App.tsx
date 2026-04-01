@@ -52,7 +52,7 @@ export default function App() {
 
           <Grid size={{ xs: 12, md: 8 }}>
             <ItemsTable />
-            <OptimizationResults show={false} byValue={true} />
+            <OptimizationResults show={true} byValue={true} />
           </Grid>
         </Grid>
       </Container>
