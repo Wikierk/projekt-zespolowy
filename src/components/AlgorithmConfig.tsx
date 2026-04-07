@@ -11,13 +11,18 @@ import {
   Button,
 } from "@mui/material";
 import { Play } from "lucide-react";
+import type { AlgorithmParams } from "../core/types";
 
 interface AlgorithmConfigProps {
-  onRun?: () => void;
+  params: AlgorithmParams;
+  onChange: (newParams: Partial<AlgorithmParams>) => void;
+  onRun: () => void;
   loading?: boolean;
 }
 
 export default function AlgorithmConfig({
+  params,
+  onChange,
   onRun,
   loading = false,
 }: AlgorithmConfigProps) {
@@ -28,15 +33,13 @@ export default function AlgorithmConfig({
           Konfiguracja Algorytmu
         </Typography>
 
-        <Box
-          sx={{ display: "flex", flexDirection: "column", gap: 2.5, mt: 2.5 }}
-        >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, mt: 2.5 }}>
           <FormControl fullWidth>
             <InputLabel id="optimization-label">Cel Optymalizacji</InputLabel>
             <Select
               labelId="optimization-label"
-              id="optimization-select"
-              defaultValue="wartość"
+              value={params.mode}
+              onChange={(e) => onChange({ mode: e.target.value as any })}
               label="Cel Optymalizacji"
             >
               <MenuItem value="wartość">Maksymalizacja Wartości</MenuItem>
@@ -49,20 +52,18 @@ export default function AlgorithmConfig({
             <TextField
               label="Max Masa (kg)"
               type="number"
-              defaultValue="100"
+              value={params.maxMass}
+              onChange={(e) => onChange({ maxMass: Number(e.target.value) })}
               size="small"
-              slotProps={{
-                htmlInput: { min: 1 },
-              }}
+              inputProps={{ min: 1 }}
             />
             <TextField
               label="Max Pow. (m²)"
               type="number"
-              defaultValue="3"
+              value={params.maxSurface}
+              onChange={(e) => onChange({ maxSurface: Number(e.target.value) })}
               size="small"
-              slotProps={{
-                htmlInput: { min: 0, step: 0.1 },
-              }}
+              inputProps={{ min: 0, step: 0.1 }}
             />
           </Box>
 
@@ -70,31 +71,28 @@ export default function AlgorithmConfig({
             <TextField
               label="Wielkość Populacji"
               type="number"
-              defaultValue="150"
+              value={params.populationSize}
+              onChange={(e) => onChange({ populationSize: Number(e.target.value) })}
               size="small"
-              slotProps={{
-                htmlInput: { min: 10 },
-              }}
+              inputProps={{ min: 10 }}
             />
             <TextField
               label="Liczba Pokoleń"
               type="number"
-              defaultValue="100"
+              value={params.generations}
+              onChange={(e) => onChange({ generations: Number(e.target.value) })}
               size="small"
-              slotProps={{
-                htmlInput: { min: 1 },
-              }}
+              inputProps={{ min: 1 }}
             />
           </Box>
 
           <TextField
             label="Prawdopodobieństwo Mutacji"
             type="number"
-            defaultValue="0.1"
+            value={params.mutationRate}
+            onChange={(e) => onChange({ mutationRate: Number(e.target.value) })}
             size="small"
-            slotProps={{
-              htmlInput: { min: 0, max: 1, step: 0.01 },
-            }}
+            inputProps={{ min: 0, max: 1, step: 0.01 }}
           />
         </Box>
 

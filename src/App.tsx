@@ -12,6 +12,7 @@ import { Layers } from "lucide-react";
 import AlgorithmConfig from "./components/AlgorithmConfig";
 import ItemsTable from "./components/ItemsTable";
 import OptimizationResults from "./components/OptimizationResults";
+import { useGeneticAlgorithm } from "./hooks/useGeneticAlgorithm";
 
 const theme = createTheme({
   palette: {
@@ -28,6 +29,11 @@ const theme = createTheme({
 });
 
 export default function App() {
+  const { 
+    items, params, isCalculating, results, 
+    addItem, removeItem, updateParams, startAlgorithm 
+  } = useGeneticAlgorithm();
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -47,12 +53,21 @@ export default function App() {
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 4 }}>
-            <AlgorithmConfig onRun={() => console.log("Run algorithm")} />
+            <AlgorithmConfig 
+              params={params} 
+              onChange={updateParams} 
+              onRun={startAlgorithm} 
+              loading={isCalculating} 
+            />
           </Grid>
 
           <Grid size={{ xs: 12, md: 8 }}>
-            <ItemsTable />
-            <OptimizationResults show={true} byValue={true} />
+            <ItemsTable 
+              items={items} 
+              onDelete={removeItem} 
+              onAdd={addItem} 
+            />
+            <OptimizationResults results={results} />
           </Grid>
         </Grid>
       </Container>
