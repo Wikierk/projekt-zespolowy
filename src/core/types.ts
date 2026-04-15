@@ -22,3 +22,8 @@ export interface Chromosome {
   
   fitness: number; 
 }
+
+export interface AlgorithmResult {
+    bestChromosome: Chromosome;
+    history: { generation: number; fitness: number }[];
+}

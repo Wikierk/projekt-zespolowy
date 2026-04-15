@@ -1,4 +1,4 @@
-import type { Chromosome, AlgorithmParams, Item, OptimizationMode } from "./types";
+import type { Chromosome, AlgorithmParams, Item, OptimizationMode, AlgorithmResult } from "./types";
 
 
 export function generateInitialPopulation(
@@ -114,16 +114,15 @@ export function mutate(chromosome: Chromosome, mutationRate: number, mode: Optim
     }
 }
 
-export function runGeneticAlgorithm(params: AlgorithmParams, items: Item[]): Chromosome {
+export function runGeneticAlgorithm(params: AlgorithmParams, items: Item[]): AlgorithmResult {
     let population = generateInitialPopulation(params.populationSize, items.length, params.mode);
-    
     let bestOverall: Chromosome | null = null;
+    
+    const history: { generation: number; fitness: number }[] = [];
 
     for (let generation = 0; generation < params.generations; generation++) {
-        
         for (const chromosome of population) {
             chromosome.fitness = calculateFitness(chromosome, params, items);
-            
             if (!bestOverall || chromosome.fitness > bestOverall.fitness) {
                 bestOverall = { genes: [...chromosome.genes], fitness: chromosome.fitness };
             }
@@ -133,6 +132,7 @@ export function runGeneticAlgorithm(params: AlgorithmParams, items: Item[]): Chr
 
         if (bestOverall) {
             newPopulation.push({ genes: [...bestOverall.genes], fitness: bestOverall.fitness });
+            history.push({ generation: generation + 1, fitness: bestOverall.fitness });
         }
 
         for (let i = 1; i < population.length; i++) {
@@ -145,5 +145,8 @@ export function runGeneticAlgorithm(params: AlgorithmParams, items: Item[]): Chr
         population = newPopulation;
     }
 
-    return bestOverall!;
+    return {
+        bestChromosome: bestOverall!,
+        history: history
+    };
 }

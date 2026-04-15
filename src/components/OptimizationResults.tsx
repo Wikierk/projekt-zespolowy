@@ -7,12 +7,49 @@ import {
   Stack,
   Alert,
 } from "@mui/material";
-import { CheckCircle, Truck } from "lucide-react";
+import { CheckCircle, Truck, TrendingUp } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import type { Item } from "../core/types";
 
 interface OptimizationResultsProps {
-  results: any;
+  results: any; 
 }
+
+const FitnessChart = ({ history }: { history: any[] }) => (
+  <Box sx={{ mt: 4, height: 280, width: "100%", backgroundColor: "white", p: 2, borderRadius: 1, border: "1px solid #e0e0e0" }}>
+    <Typography variant="body2" sx={{ fontWeight: 600, color: "#666", mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+      <TrendingUp size={18} /> PRZEBIEG EWOLUCJI (Wzrost funkcji przystosowania)
+    </Typography>
+    <ResponsiveContainer width="100%" height="85%">
+      <LineChart data={history} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+        <XAxis dataKey="generation" tick={{ fontSize: 12 }} />
+        <YAxis tick={{ fontSize: 12 }} />
+        <Tooltip 
+          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+          labelFormatter={(label) => `Pokolenie: ${label}`}
+        />
+        <Line 
+          type="monotone" 
+          dataKey="fitness" 
+          stroke="#1976d2" 
+          strokeWidth={3} 
+          dot={false} 
+          activeDot={{ r: 6 }} 
+          animationDuration={1500}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </Box>
+);
 
 export default function OptimizationResults({ results }: OptimizationResultsProps) {
   if (!results) {
@@ -23,7 +60,6 @@ export default function OptimizationResults({ results }: OptimizationResultsProp
     );
   }
 
-  // WIDOK 1: Klasyczny Problem Plecakowy
   if (results.type === "knapsack") {
     return (
       <Card elevation={3} sx={{ borderLeft: "6px solid #4caf50", backgroundColor: "#fafafa" }}>
@@ -66,12 +102,14 @@ export default function OptimizationResults({ results }: OptimizationResultsProp
               ))}
             </Stack>
           </Box>
+
+          {results.history && <FitnessChart history={results.history} />}
+
         </CardContent>
       </Card>
     );
   }
 
-  // WIDOK 2: Minimalizacja liczby kursów
   return (
     <Card elevation={3} sx={{ borderLeft: "6px solid #4caf50", backgroundColor: "#fafafa" }}>
       <CardContent>
@@ -112,6 +150,9 @@ export default function OptimizationResults({ results }: OptimizationResultsProp
             ))}
           </Stack>
         </Box>
+
+        {results.history && <FitnessChart history={results.history} />}
+
       </CardContent>
     </Card>
   );
