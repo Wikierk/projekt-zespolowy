@@ -1,4 +1,4 @@
-export type OptimizationMode = "wartość" | "masa" | "kursy";
+export type OptimizationMode = "wartość" | "kursy";
 
 export interface Item {
   id: number;

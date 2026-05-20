@@ -12,7 +12,7 @@ export function generateInitialPopulation(
     const genes: number[] = [];
 
     for (let j = 0; j < chromosomeLength; j++) {
-      if (mode === "wartość" || mode === "masa") {
+      if (mode === "wartość" ) {
         genes.push(Math.round(Math.random()));
       } else if (mode === "kursy") {
         const randomTripId = Math.floor(Math.random() * chromosomeLength) + 1;
@@ -30,7 +30,7 @@ export function generateInitialPopulation(
 
 export function calculateFitness(chromosome: Chromosome, params: AlgorithmParams, items: Item[]): number {
   
-  if (params.mode === "wartość" || params.mode === "masa") {
+  if (params.mode === "wartość" ) {
     let totalValue = 0;
     let totalMass = 0;
     let totalSurface = 0;
@@ -104,7 +104,7 @@ export function crossover(parent1: Chromosome, parent2: Chromosome): Chromosome 
 export function mutate(chromosome: Chromosome, mutationRate: number, mode: OptimizationMode): void {
     for (let i = 0; i < chromosome.genes.length; i++) {
         if (Math.random() < mutationRate) {
-            if (mode === "wartość" || mode === "masa") {
+            if (mode === "wartość") {
                 chromosome.genes[i] = chromosome.genes[i] === 0 ? 1 : 0;
             } else if (mode === "kursy") {
                 const randomTripId = Math.floor(Math.random() * chromosome.genes.length) + 1;

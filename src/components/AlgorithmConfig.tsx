@@ -43,7 +43,6 @@ export default function AlgorithmConfig({
               label="Cel Optymalizacji"
             >
               <MenuItem value="wartość">Maksymalizacja Wartości</MenuItem>
-              <MenuItem value="masa">Minimalizacja Masy</MenuItem>
               <MenuItem value="kursy">Minimalizacja Liczby Kursów</MenuItem>
             </Select>
           </FormControl>

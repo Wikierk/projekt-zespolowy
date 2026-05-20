@@ -7,6 +7,7 @@ import {
   Typography,
   Container,
   Grid,
+  Stack,
 } from "@mui/material";
 import { Layers } from "lucide-react";
 import AlgorithmConfig from "./components/AlgorithmConfig";
@@ -42,11 +43,16 @@ export default function App() {
         <Toolbar>
           <Layers size={28} style={{ marginRight: "12px" }} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inteligentny Pakowacz (GA)
+            Problem Plecakowy
           </Typography>
+          <Stack direction="row" spacing={2} alignItems="center">
           <Typography variant="body2" sx={{ opacity: 0.8 }}>
             Zespół: Wiktor Pacak, Jakub Pietrzykowski, Oliwia Salwierak
           </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.8 }} >
+             Rok: 2025/2026
+          </Typography>
+          </Stack>
         </Toolbar>
       </AppBar>
 
