@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { Item, AlgorithmParams, AlgorithmResult } from "../core/types";
 
-
 // const initialItems: Item[] = [
 //   { id: 1, name: "Lodówka", mass: 50, surface: 1.5, value: 2000 },
 //   { id: 2, name: "Telewizor", mass: 15, surface: 0.8, value: 3500 },
@@ -50,12 +49,12 @@ export function useGeneticAlgorithm() {
   const [params, setParams] = useState<AlgorithmParams>(initialParams);
   const [isCalculating, setIsCalculating] = useState(false);
   const [results, setResults] = useState<any>(null);
-  
-  
+
   const workerRef = useRef<Worker | null>(null);
 
   const addItem = (item: Omit<Item, "id">) => {
-    const newId = items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
+    const newId =
+      items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
     setItems([...items, { ...item, id: newId }]);
   };
 
@@ -65,74 +64,95 @@ export function useGeneticAlgorithm() {
 
   const updateParams = (newParams: Partial<AlgorithmParams>) => {
     setParams({ ...params, ...newParams });
-    setResults(null); 
+    setResults(null);
   };
 
   const startAlgorithm = useCallback(() => {
     if (items.length === 0) {
-        alert("Brak przedmiotów do spakowania!");
-        return;
+      alert("Brak przedmiotów do spakowania!");
+      return;
     }
 
     setIsCalculating(true);
     const startTime = performance.now();
 
-    workerRef.current = new Worker(new URL('../core/genetic.worker.ts', import.meta.url), {
-      type: 'module'
-    });
+    workerRef.current = new Worker(
+      new URL("../core/genetic.worker.ts", import.meta.url),
+      {
+        type: "module",
+      },
+    );
 
     workerRef.current.onmessage = (event: MessageEvent<AlgorithmResult>) => {
-        const { bestChromosome, history } = event.data;
-        const calcTime = Math.round(performance.now() - startTime);
+      const { bestChromosome, history } = event.data;
+      const calcTime = Math.round(performance.now() - startTime);
 
-        if (params.mode === "wartość" || params.mode === "masa") {
-            let totalVal = 0, totalM = 0, totalS = 0;
-            const packedItemsList: Item[] = [];
+      if (params.mode === "wartość") {
+        let totalVal = 0,
+          totalM = 0,
+          totalS = 0;
+        const packedItemsList: Item[] = [];
 
-            for (let i = 0; i < bestChromosome.genes.length; i++) {
-                if (bestChromosome.genes[i] === 1) {
-                    totalVal += items[i].value;
-                    totalM += items[i].mass;
-                    totalS += items[i].surface;
-                    packedItemsList.push(items[i]);
-                }
-            }
-
-            setResults({
-                type: "knapsack", calcTimeMs: calcTime, fitness: bestChromosome.fitness,
-                totalValue: totalVal, usedMass: totalM, usedSurface: Number(totalS.toFixed(2)),
-                packedItems: packedItemsList.length, packedList: packedItemsList, history: history
-            });
-
-        } else if (params.mode === "kursy") {
-            const tripsMap: Record<number, { items: string[]; mass: number; surface: number }> = {};
-
-            for (let i = 0; i < bestChromosome.genes.length; i++) {
-                const tripId = bestChromosome.genes[i];
-                if (!tripsMap[tripId]) { tripsMap[tripId] = { items: [], mass: 0, surface: 0 }; }
-                tripsMap[tripId].items.push(items[i].name);
-                tripsMap[tripId].mass += items[i].mass;
-                tripsMap[tripId].surface += items[i].surface;
-            }
-
-            const deliveries = Object.keys(tripsMap).map((key, index) => ({
-                id: index + 1, items: tripsMap[Number(key)].items, mass: tripsMap[Number(key)].mass,
-                maxMass: params.maxMass, surface: Number(tripsMap[Number(key)].surface.toFixed(2)), maxSurface: params.maxSurface,
-            }));
-
-            setResults({
-                type: "deliveries", calcTimeMs: calcTime, fitness: bestChromosome.fitness,
-                deliveries: deliveries, history: history
-            });
+        for (let i = 0; i < bestChromosome.genes.length; i++) {
+          if (bestChromosome.genes[i] === 1) {
+            totalVal += items[i].value;
+            totalM += items[i].mass;
+            totalS += items[i].surface;
+            packedItemsList.push(items[i]);
+          }
         }
 
-        setIsCalculating(false);
-        
-        workerRef.current?.terminate();
+        setResults({
+          type: "knapsack",
+          calcTimeMs: calcTime,
+          fitness: bestChromosome.fitness,
+          totalValue: totalVal,
+          usedMass: totalM,
+          usedSurface: Number(totalS.toFixed(2)),
+          packedItems: packedItemsList.length,
+          packedList: packedItemsList,
+          history: history,
+        });
+      } else if (params.mode === "kursy") {
+        const tripsMap: Record<
+          number,
+          { items: string[]; mass: number; surface: number }
+        > = {};
+
+        for (let i = 0; i < bestChromosome.genes.length; i++) {
+          const tripId = bestChromosome.genes[i];
+          if (!tripsMap[tripId]) {
+            tripsMap[tripId] = { items: [], mass: 0, surface: 0 };
+          }
+          tripsMap[tripId].items.push(items[i].name);
+          tripsMap[tripId].mass += items[i].mass;
+          tripsMap[tripId].surface += items[i].surface;
+        }
+
+        const deliveries = Object.keys(tripsMap).map((key, index) => ({
+          id: index + 1,
+          items: tripsMap[Number(key)].items,
+          mass: tripsMap[Number(key)].mass,
+          maxMass: params.maxMass,
+          surface: Number(tripsMap[Number(key)].surface.toFixed(2)),
+          maxSurface: params.maxSurface,
+        }));
+
+        setResults({
+          type: "deliveries",
+          calcTimeMs: calcTime,
+          fitness: bestChromosome.fitness,
+          deliveries: deliveries,
+          history: history,
+        });
+      }
+
+      setIsCalculating(false);
+
+      workerRef.current?.terminate();
     };
 
     workerRef.current.postMessage({ params, items });
-
   }, [params, items]);
 
   useEffect(() => {
@@ -141,5 +161,14 @@ export function useGeneticAlgorithm() {
     };
   }, []);
 
-  return { items, params, isCalculating, results, addItem, removeItem, updateParams, startAlgorithm };
+  return {
+    items,
+    params,
+    isCalculating,
+    results,
+    addItem,
+    removeItem,
+    updateParams,
+    startAlgorithm,
+  };
 }
