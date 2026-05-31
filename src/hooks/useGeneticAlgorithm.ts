@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import type { Item, AlgorithmParams, AlgorithmResult } from "../core/types";
+import type { Item, AlgorithmParams, AlgorithmResult, ProblemResult } from "../core/types";
 
 // const initialItems: Item[] = [
 //   { id: 1, name: "Lodówka", mass: 50, surface: 1.5, value: 2000 },
@@ -48,7 +48,7 @@ export function useGeneticAlgorithm() {
   const [items, setItems] = useState<Item[]>(initialItems);
   const [params, setParams] = useState<AlgorithmParams>(initialParams);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<ProblemResult | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
 

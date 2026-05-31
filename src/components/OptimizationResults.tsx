@@ -17,15 +17,55 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { Item } from "../core/types";
+import type { Item, ProblemResult, KnapsackResult, DeliveriesResult, DeliveryTrip } from "../core/types";
 
 interface OptimizationResultsProps {
-  results: any; 
+  results: ProblemResult | null;
 }
 
 interface ResultHeaderProps {
   icon: React.ReactNode;
   timeInMs: number;
+}
+
+interface FitnessChartProps {
+  history: Array<{ generation: number; fitness: number }>;
+}
+
+interface KnapsackStatsProps {
+  totalValue: number;
+  usedMass: number;
+  usedSurface: number;
+  packedItems: number;
+}
+
+interface KnapsackItemRowProps {
+  item: Item;
+}
+
+interface KnapsackItemsListProps {
+  items: Item[];
+}
+
+interface KnapsackProblemResultProps {
+  results: KnapsackResult;
+}
+
+interface DeliveryStatsProps {
+  deliveryCount: number;
+  fitness: number;
+}
+
+interface DeliveryRowProps {
+  delivery: DeliveryTrip;
+}
+
+interface DeliveryListProps {
+  deliveries: DeliveryTrip[];
+}
+
+interface DeliveryProblemResultProps {
+  results: DeliveriesResult;
 }
 
 const ResultHeader = ({ icon, timeInMs }: ResultHeaderProps) => (
@@ -36,7 +76,7 @@ const ResultHeader = ({ icon, timeInMs }: ResultHeaderProps) => (
   </Box>
 );
 
-const FitnessChart = ({ history }: { history: any[] }) => (
+const FitnessChart = ({ history }: FitnessChartProps) => (
   <Box sx={{ mt: 4, height: 280, width: "100%", backgroundColor: "white", p: 2, borderRadius: 1, border: "1px solid #e0e0e0" }}>
     <Typography variant="body2" sx={{ fontWeight: 600, color: "#666", mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
       <TrendingUp size={18} /> PRZEBIEG EWOLUCJI (Wzrost funkcji przystosowania)
@@ -64,37 +104,37 @@ const FitnessChart = ({ history }: { history: any[] }) => (
   </Box>
 );
 
-const KnapsackStats = ({ results }: { results: any }) => (
+const KnapsackStats = ({ totalValue, usedMass, usedSurface, packedItems }: KnapsackStatsProps) => (
   <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "1fr 1fr 1fr 1fr" }, gap: 2, mb: 3 }}>
     <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1 }}>
       <Typography variant="body2" sx={{ color: "#666", textTransform: "uppercase", mb: 0.5 }}>Całkowita Wartość</Typography>
-      <Typography variant="h5" sx={{ color: "#2e7d32", fontWeight: 600 }}>{results.totalValue} PLN</Typography>
+      <Typography variant="h5" sx={{ color: "#2e7d32", fontWeight: 600 }}>{totalValue} PLN</Typography>
     </Box>
     <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1 }}>
       <Typography variant="body2" sx={{ color: "#666", textTransform: "uppercase", mb: 0.5 }}>Wykorzystana Masa</Typography>
-      <Typography variant="h5" sx={{ color: "#1976d2", fontWeight: 600 }}>{results.usedMass}</Typography>
+      <Typography variant="h5" sx={{ color: "#1976d2", fontWeight: 600 }}>{usedMass}</Typography>
       <Typography variant="caption" sx={{ color: "#999" }}>kg</Typography>
     </Box>
     <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1 }}>
       <Typography variant="body2" sx={{ color: "#666", textTransform: "uppercase", mb: 0.5 }}>Zajęta Powierzchnia</Typography>
-      <Typography variant="h5" sx={{ color: "#1976d2", fontWeight: 600 }}>{results.usedSurface}</Typography>
+      <Typography variant="h5" sx={{ color: "#1976d2", fontWeight: 600 }}>{usedSurface}</Typography>
       <Typography variant="caption" sx={{ color: "#999" }}>m²</Typography>
     </Box>
     <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1 }}>
       <Typography variant="body2" sx={{ color: "#666", textTransform: "uppercase", mb: 0.5 }}>Spakowane</Typography>
-      <Typography variant="h5" sx={{ color: "#1976d2", fontWeight: 600 }}>{results.packedItems} przedm.</Typography>
+      <Typography variant="h5" sx={{ color: "#1976d2", fontWeight: 600 }}>{packedItems} przedm.</Typography>
     </Box>
   </Box>
 );
 
-const KnapsackItemRow = ({ item }: { item: Item }) => (
+const KnapsackItemRow = ({ item }: KnapsackItemRowProps) => (
   <Box sx={{ p: 1.5, backgroundColor: "#e8f5e9", borderRadius: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
     <Typography variant="body2" sx={{ fontWeight: 500 }}>{item.name}</Typography>
     <Typography variant="caption" sx={{ color: "#666" }}>{item.mass} kg | {item.surface} m² | {item.value} PLN</Typography>
   </Box>
 );
 
-const KnapsackItemsList = ({ items }: { items: Item[] }) => (
+const KnapsackItemsList = ({ items }: KnapsackItemsListProps) => (
   <Box>
     <Typography variant="body2" sx={{ fontWeight: 600, color: "#666", mb: 1.5 }}>ZAWARTOŚĆ PLECAKA:</Typography>
     <Stack spacing={1}>
@@ -105,12 +145,12 @@ const KnapsackItemsList = ({ items }: { items: Item[] }) => (
   </Box>
 );
 
-const KnapsackProblemResult = ({ results }: { results: any }) => {
+const KnapsackProblemResult = ({ results }: KnapsackProblemResultProps) => {
   return (
     <Card elevation={3} sx={{ borderLeft: "6px solid #4caf50", backgroundColor: "#fafafa" }}>
       <CardContent>
         <ResultHeader icon={<CheckCircle size={24} style={{ color: "#2e7d32" }} />} timeInMs={results.calcTimeMs} />
-        <KnapsackStats results={results} />
+        <KnapsackStats totalValue={results.totalValue} usedMass={results.usedMass} usedSurface={results.usedSurface} packedItems={results.packedItems} />
         <KnapsackItemsList items={results.packedList} />
         {results.history && <FitnessChart history={results.history} />}
       </CardContent>
@@ -118,20 +158,20 @@ const KnapsackProblemResult = ({ results }: { results: any }) => {
   );
 }
 
-const DeliveryStats = ({ results }: { results: any }) => (
+const DeliveryStats = ({ deliveryCount, fitness }: DeliveryStatsProps) => (
   <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2, mb: 3 }}>
     <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1 }}>
       <Typography variant="body2" sx={{ color: "#666", textTransform: "uppercase", mb: 0.5 }}>Potrzebne Kursy</Typography>
-      <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 600 }}>{results.deliveries.length} Kursy</Typography>
+      <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 600 }}>{deliveryCount} Kursy</Typography>
     </Box>
     <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1 }}>
       <Typography variant="body2" sx={{ color: "#666", textTransform: "uppercase", mb: 0.5 }}>Fitness (Jakość rozwiązania)</Typography>
-      <Typography variant="h6" sx={{ color: "#1976d2", fontWeight: 600 }}>{(results.fitness || 0).toFixed(2)}</Typography>
+      <Typography variant="h6" sx={{ color: "#1976d2", fontWeight: 600 }}>{fitness.toFixed(2)}</Typography>
     </Box>
   </Box>
 );
 
-const DeliveryRow = ({ delivery }: { delivery: any }) => (
+const DeliveryRow = ({ delivery }: DeliveryRowProps) => (
   <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 1, border: "1px solid #e0e0e0" }}>
     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Kurs #{delivery.id}</Typography>
@@ -147,11 +187,11 @@ const DeliveryRow = ({ delivery }: { delivery: any }) => (
   </Box>
 );
 
-const DeliveryList = ({ deliveries }: { deliveries: any[] }) => (
+const DeliveryList = ({ deliveries }: DeliveryListProps) => (
   <Box>
     <Typography variant="body2" sx={{ fontWeight: 600, color: "#666", mb: 1.5 }}>ROZKŁAD PAKOWANIA:</Typography>
     <Stack spacing={1.5}>
-      {deliveries.map((delivery: any) => (
+      {deliveries.map((delivery: DeliveryTrip) => (
         <DeliveryRow key={delivery.id} delivery={delivery} />
       ))}
     </Stack>
@@ -159,12 +199,12 @@ const DeliveryList = ({ deliveries }: { deliveries: any[] }) => (
 );
 
 
-const DeliveryProblemResult = ({ results }: { results: any }) => {
+const DeliveryProblemResult = ({ results }: DeliveryProblemResultProps) => {
   return (
     <Card elevation={3} sx={{ borderLeft: "6px solid #4caf50", backgroundColor: "#fafafa" }}>
       <CardContent>
         <ResultHeader icon={<Truck size={24} style={{ color: "#2e7d32" }} />} timeInMs={results.calcTimeMs} />
-        <DeliveryStats results={results} />
+        <DeliveryStats deliveryCount={results.deliveries.length} fitness={results.fitness || 0} />
         <DeliveryList deliveries={results.deliveries} />
         {results.history && <FitnessChart history={results.history} />}
       </CardContent>
