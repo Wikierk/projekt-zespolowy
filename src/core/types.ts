@@ -19,7 +19,6 @@ export interface AlgorithmParams {
 
 export interface Chromosome {
   genes: number[]; 
-  
   fitness: number; 
 }
 
